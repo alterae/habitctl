@@ -15,6 +15,7 @@ use std::env;
 use std::fs;
 use std::fs::File;
 use std::fs::OpenOptions;
+use std::io;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Write;
@@ -41,7 +42,9 @@ fn main() {
         .subcommand(SubCommand::with_name("edith").about("Edit list of current habits"))
         .get_matches();
 
-    let mut habitctl = HabitCtl::new();
+    // FIXME: Should really replace with more robust error handling.
+    // Then again this entire program is bad error handling so.
+    let mut habitctl = HabitCtl::new().expect("IO error while trying to create HabitCtl struct");
     habitctl.load();
 
     let ago: i64 = if habitctl.first_date().is_some() {
@@ -112,7 +115,7 @@ enum DayStatus {
 }
 
 impl HabitCtl {
-    fn new() -> HabitCtl {
+    fn new() -> io::Result<HabitCtl> {
         let mut habitctl_dir = dirs::home_dir().unwrap();
         habitctl_dir.push(".habitctl");
         if !habitctl_dir.is_dir() {
@@ -139,15 +142,15 @@ impl HabitCtl {
             writeln!(
                 &file,
                 "# The numbers specifies how often you want to do a habit:"
-            );
+            )?;
             writeln!(
                 &file,
                 "# 1 means daily, 7 means weekly, 0 means you're just tracking the habit. Some examples:"
-            );
+            )?;
             write!(
                 &file,
                 "\n# 1 Meditated\n# 7 Cleaned the apartment\n# 0 Had a headache\n# 1 Used habitctl\n"
-            );
+            )?;
 
             println!(
                 "Created {}. This file will contain your habit log.\n",
@@ -155,13 +158,13 @@ impl HabitCtl {
             );
         }
 
-        HabitCtl {
+        Ok(HabitCtl {
             habits_file,
             log_file,
             habits: vec![],
             log: HashMap::new(),
             entries: vec![],
-        }
+        })
     }
 
     fn load(&mut self) {
