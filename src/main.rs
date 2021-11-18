@@ -579,7 +579,9 @@ impl HabitCtl {
     }
 
     fn open_file(&self, filename: &Path) {
-        let editor = env::var("EDITOR").unwrap_or_else(|_| String::from("vi"));
+        // FIXME: Crashes with no good output if no editor is found.
+        let editor = env::var("VISUAL")
+            .unwrap_or_else(|_| env::var("EDITOR").unwrap_or_else(|_| "vi".into()));
         Command::new(editor)
             .arg(filename)
             .spawn()
