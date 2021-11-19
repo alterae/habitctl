@@ -588,7 +588,7 @@ impl HabitCtl {
         Command::new(editor)
             .arg(filename)
             .spawn()
-            .unwrap()
+            .expect("Could not find a text editor.  Ensure $VISUAL or $EDITOR is set.")
             .wait()
             .unwrap();
     }
