@@ -1,6 +1,6 @@
 [package]
 name = "habitctl"
-version = "0.3.2"
+version = "0.3.4"
 authors = ["Sebastian Morr <sebastian@morr.cc>", "Daryl Manning <daryl@wakatara.com>"]
 description = "Minimalist command line tool you can use to track and examine your habits."
 
